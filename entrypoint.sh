@@ -44,15 +44,15 @@ echo "pre_release = $pre_release"
 # fetch tags
 git fetch --tags
 
-# get latest tag that looks like a semver (with or without v)
+# get latest tag that looks like a semver (with or without idea)
 case "$tag_context" in
     *repo*) 
-        tag=$(git for-each-ref --sort=-v:refname --format '%(refname:lstrip=2)' | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+$" | head -n1)
-        pre_tag=$(git for-each-ref --sort=-v:refname --format '%(refname:lstrip=2)' | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+(-$suffix\.[0-9]+)?$" | head -n1)
+        tag=$(git for-each-ref --sort=-v:refname --format '%(refname:lstrip=2)' | grep -E "^idea-?[0-9]+\.[0-9]+\.[0-9]+$" | head -n1 | cut -d- -f2-)
+        pre_tag=$(git for-each-ref --sort=-v:refname --format '%(refname:lstrip=2)' | grep -E "^idea-?[0-9]+\.[0-9]+\.[0-9]+(-$suffix\.[0-9]+)?$" | head -n1 | cut -d- -f2-)
         ;;
     *branch*) 
-        tag=$(git tag --list --merged HEAD --sort=-v:refname | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+$" | head -n1)
-        pre_tag=$(git tag --list --merged HEAD --sort=-v:refname | grep -E "^v?[0-9]+\.[0-9]+\.[0-9]+(-$suffix\.[0-9]+)?$" | head -n1)
+        tag=$(git tag --list --merged HEAD --sort=-v:refname | grep -E "^idea-?[0-9]+\.[0-9]+\.[0-9]+$" | head -n1 | cut -d- -f2-)
+        pre_tag=$(git tag --list --merged HEAD --sort=-v:refname | grep -E "^idea-?[0-9]+\.[0-9]+\.[0-9]+(-$suffix\.[0-9]+)?$" | head -n1 | cut -d- -f2-)
         ;;
     * ) echo "Unrecognised context"; exit 1;;
 esac
@@ -89,9 +89,9 @@ then
 fi
 
 case "$log" in
-    *#major* ) new=$(semver -i major $tag); part="major";;
-    *#minor* ) new=$(semver -i minor $tag); part="minor";;
-    *#patch* ) new=$(semver -i patch $tag); part="patch";;
+    *#major* ) new=idea-$(semver -i major $tag); part="major";;
+    *#minor* ) new=idea-$(semver -i minor $tag); part="minor";;
+    *#patch* ) new=idea-$(semver -i patch $tag); part="patch";;
     *#none* ) 
         echo "Default bump was set to none. Skipping..."; echo ::set-output name=new_tag::$tag; echo ::set-output name=tag::$tag; exit 0;;
     * ) 
